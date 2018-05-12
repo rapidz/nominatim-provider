@@ -144,7 +144,7 @@ final class Nominatim extends AbstractHttpProvider implements Provider
         }
         $builder->setPostalCode($postalCode);
 
-        $localityFields = ['city', 'town', 'village', 'hamlet'];
+        $localityFields = ['city', 'town', 'village', 'hamlet', 'state'];
         foreach ($localityFields as $localityField) {
             $localityFieldContent = $this->getNodeValue($addressNode->getElementsByTagName($localityField));
             if (!empty($localityFieldContent)) {
@@ -157,7 +157,19 @@ final class Nominatim extends AbstractHttpProvider implements Provider
         $builder->setStreetName($this->getNodeValue($addressNode->getElementsByTagName('road')) ?: $this->getNodeValue($addressNode->getElementsByTagName('pedestrian')));
         $builder->setStreetNumber($this->getNodeValue($addressNode->getElementsByTagName('house_number')));
         $builder->setSubLocality($this->getNodeValue($addressNode->getElementsByTagName('suburb')));
-        $builder->setCountry($this->getNodeValue($addressNode->getElementsByTagName('country')));
+
+        $countryFields = ['city', 'town', 'village', 'hamlet', 'state'];
+        foreach ($countryFields as $countryField) {
+            $countryFieldContent = $this->getNodeValue($addressNode->getElementsByTagName($countryField));
+            if (!empty($countryFieldContent)) {
+                $builder->setCountry($countryFieldContent);
+
+                break;
+            }
+        }
+
+
+        //$builder->setCountry($this->getNodeValue($addressNode->getElementsByTagName('country')));
 
         $countryCode = $this->getNodeValue($addressNode->getElementsByTagName('country_code'));
         if (!empty($countryCode)) {
@@ -215,12 +227,12 @@ final class Nominatim extends AbstractHttpProvider implements Provider
 
     private function getGeocodeEndpointUrl(): string
     {
-        return $this->rootUrl.'/search?q=%s&format=xml&addressdetails=1&limit=%d';
+        return $this->rootUrl.'/search?q=%s&format=xml&addressdetails=1&limit=%d&accept-language=en';
     }
 
     private function getReverseEndpointUrl(): string
     {
-        return $this->rootUrl.'/reverse?format=xml&lat=%F&lon=%F&addressdetails=1&zoom=%d';
+        return $this->rootUrl.'/reverse?format=xml&lat=%F&lon=%F&addressdetails=1&zoom=%d&accept-language=en';
     }
 
     private function getNodeValue(\DOMNodeList $element)
