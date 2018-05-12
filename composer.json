@@ -1,5 +1,5 @@
 {
-    "name": "geocoder-php/nominatim-provider",
+    "name": "rapidz/nominatim-provider",
     "type": "library",
     "description": "Geocoder Nominatim adapter",
     "keywords": [],
